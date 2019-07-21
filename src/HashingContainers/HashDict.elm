@@ -6,18 +6,22 @@ import Typeclasses.Classes.Hashing as Hashing exposing (Hashing)
 import HashingContainers.HashTrie as HashTrie exposing (HashTrie)
 
 
-type alias HashDict key value = HashTrie (key, value)
+type alias HashDict key value = HashTrie key (key, value)
 
-empty : Equality key -> Hashing key -> Int -> HashDict key value
-empty equality hashing expectedSizeAsPowerOfTwo =
-  HashTrie.empty
-    (Equality.map Tuple.first equality)
-    (Hashing.map Tuple.first hashing)
-    expectedSizeAsPowerOfTwo
+empty : Equality key -> Hashing key -> HashDict key value
+empty equality hashing = HashTrie.empty equality hashing Tuple.first
 
-fromList : Equality key -> Hashing key -> Int -> List (key, value) -> HashDict key value
-fromList equality hashing expectedSizeAsPowerOfTwo =
-  HashTrie.fromList
-    (Equality.map Tuple.first equality)
-    (Hashing.map Tuple.first hashing)
-    expectedSizeAsPowerOfTwo
+fromList : Equality key -> Hashing key -> List (key, value) -> HashDict key value
+fromList equality hashing = HashTrie.fromList equality hashing Tuple.first
+
+insert : key -> value -> HashDict key value -> HashDict key value
+insert key value = HashTrie.insert (key, value)
+
+remove : key -> HashDict key value -> HashDict key value
+remove key = HashTrie.remove key
+
+update : key -> (Maybe value -> Maybe value) -> HashDict key value -> HashDict key value
+update key updateFn = HashTrie.update key (Maybe.map Tuple.second >> updateFn >> Maybe.map (Tuple.pair key))
+
+lookup : key -> HashDict key value -> Maybe value
+lookup key = HashTrie.lookup key >> Maybe.map Tuple.second
