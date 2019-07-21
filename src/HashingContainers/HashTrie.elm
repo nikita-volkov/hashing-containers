@@ -88,3 +88,6 @@ lookup key hashTrie =
     in case IntDict.get hash hashTrie.data of
       Just entryList -> List.find (eq key << entryToKey) entryList
       Nothing -> Nothing
+
+isEmpty : HashTrie key entry -> Bool
+isEmpty = .data >> IntDict.isEmpty

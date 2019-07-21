@@ -25,3 +25,6 @@ update key updateFn = HashTrie.update key (Maybe.map Tuple.second >> updateFn >>
 
 lookup : key -> HashDict key value -> Maybe value
 lookup key = HashTrie.lookup key >> Maybe.map Tuple.second
+
+isEmpty : HashDict key value -> Bool
+isEmpty = HashTrie.isEmpty
