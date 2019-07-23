@@ -25,6 +25,9 @@ empty equality hashing entryToKey = HashTrie equality hashing entryToKey IntDict
 fromList : Equality key -> Hashing key -> (entry -> key) -> List entry -> HashTrie key entry
 fromList equality hashing entryToKey = List.foldl insert (empty equality hashing entryToKey)
 
+fromArray : Equality key -> Hashing key -> (entry -> key) -> Array entry -> HashTrie key entry
+fromArray equality hashing entryToKey = Array.foldl insert (empty equality hashing entryToKey)
+
 -- * Tranformation
 -------------------------
 

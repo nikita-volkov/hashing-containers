@@ -14,6 +14,9 @@ empty equality hashing = HashTrie.empty equality hashing Tuple.first
 fromList : Equality key -> Hashing key -> List (key, value) -> HashDict key value
 fromList equality hashing = HashTrie.fromList equality hashing Tuple.first
 
+fromArray : Equality key -> Hashing key -> Array (key, value) -> HashDict key value
+fromArray equality hashing = HashTrie.fromArray equality hashing Tuple.first
+
 insert : key -> value -> HashDict key value -> HashDict key value
 insert key value = HashTrie.insert (key, value)
 
