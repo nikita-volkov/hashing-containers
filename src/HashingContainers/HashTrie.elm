@@ -36,8 +36,13 @@ insert entry hashTrie =
   let
     key = hashTrie.entryToKey entry
     hash = hashTrie.hashing.hash key
+    eq = hashTrie.equality.eq
+    entryToKey = hashTrie.entryToKey
     updateIntDict maybeList = case maybeList of
-      Just list -> Just (entry :: list)
+      Just list ->
+        let
+          updateFn _ = Just entry
+          in List.findAndUpdate (eq key << entryToKey) updateFn list |> Just
       Nothing -> Just (List.singleton entry)
     in { hashTrie | data = IntDict.update hash updateIntDict hashTrie.data }
 
@@ -70,7 +75,7 @@ update key updateFn hashTrie =
         eq = hashTrie.equality.eq
         entryToKey = hashTrie.entryToKey
         updateIntDict maybeList = case maybeList of
-          Just list -> case List.findAndUpdate (eq key << entryToKey) (updateFn << Just) list of
+          Just list -> case List.findAndUpdate (eq key << entryToKey) updateFn list of
             [] -> Nothing
             newList -> Just newList
           Nothing -> case updateFn Nothing of

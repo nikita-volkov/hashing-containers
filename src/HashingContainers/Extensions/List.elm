@@ -62,16 +62,18 @@ findAndModify predicate modify list =
     in loop [] list
 
 {-| *O(n)*. Update the first occurrence of matching element. -}
-findAndUpdate : (a -> Bool) -> (a -> Maybe a) -> List a -> List a
+findAndUpdate : (a -> Bool) -> (Maybe a -> Maybe a) -> List a -> List a
 findAndUpdate predicate update list =
   let
     loop precedingList currentList = case currentList of
       head :: tail -> if predicate head
-        then case update head of
+        then case update (Just head) of
           Just newHead -> prependReversed precedingList (newHead :: tail)
           Nothing -> prependReversed precedingList tail
         else loop (head :: precedingList) tail
-      _ -> list
+      _ -> case update Nothing of
+        Just newHead -> List.reverse (newHead :: precedingList)
+        Nothing -> list
     in loop [] list
 
 prependReversed : List a -> List a -> List a
