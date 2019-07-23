@@ -91,3 +91,12 @@ lookup key hashTrie =
 
 isEmpty : HashTrie key entry -> Bool
 isEmpty = .data >> IntDict.isEmpty
+
+foldl : (entry -> acc -> acc) -> acc -> HashTrie key entry -> acc
+foldl step acc = .data >> IntDict.foldl (\ _ entryList innerAcc -> List.foldl step innerAcc entryList) acc
+
+toList : HashTrie key entry -> List entry
+toList =
+  let
+    step hash entryList list = entryList ++ list
+    in .data >> IntDict.foldl step []

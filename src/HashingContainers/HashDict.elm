@@ -28,3 +28,9 @@ lookup key = HashTrie.lookup key >> Maybe.map Tuple.second
 
 isEmpty : HashDict key value -> Bool
 isEmpty = HashTrie.isEmpty
+
+foldl : ((key, value) -> result -> result) -> result -> HashDict key value -> result
+foldl = HashTrie.foldl
+
+toList : HashDict key value -> List (key, value)
+toList = HashTrie.toList
