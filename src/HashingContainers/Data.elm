@@ -1,4 +1,4 @@
-module HashingContainers.HashTrie.Data exposing (..)
+module HashingContainers.Data exposing (..)
 
 import IntDict exposing (IntDict)
 import HashingContainers.Extensions.List as List
