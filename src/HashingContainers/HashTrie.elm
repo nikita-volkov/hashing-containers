@@ -65,8 +65,8 @@ update updateFn hash entryPredicate =
 -- * Access
 -------------------------
 
-lookup : Int -> (entry -> Bool) -> HashTrie entry -> Maybe entry
-lookup hash entryPredicate data =
+get : Int -> (entry -> Bool) -> HashTrie entry -> Maybe entry
+get hash entryPredicate data =
   case IntDict.get hash data of
     Just entryList -> List.find entryPredicate entryList
     Nothing -> Nothing

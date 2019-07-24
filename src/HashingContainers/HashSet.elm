@@ -49,7 +49,7 @@ remove : value -> HashSet value -> HashSet value
 remove = mapHashTrieAtKey HashTrie.remove
 
 member : value -> HashSet value -> Bool
-member value = accessHashTrieAtKey HashTrie.lookup value >> Maybe.match False (always True)
+member value = accessHashTrieAtKey HashTrie.get value >> Maybe.match False (always True)
 
 isEmpty : HashSet value -> Bool
 isEmpty = .trie >> HashTrie.isEmpty

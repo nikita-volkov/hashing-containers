@@ -45,7 +45,7 @@ dictComparison =
               HashDict.toList |> List.sort
             in equal expected actual
       ,
-      fuzz2 (tuple (string, int)) (list (tuple (string, int))) "lookup" <| \ head list ->
+      fuzz2 (tuple (string, int)) (list (tuple (string, int))) "get" <| \ head list ->
         let
           shuffledList =
             head :: list |> Random.List.shuffle |>
@@ -55,6 +55,6 @@ dictComparison =
           hashDict =
             HashDict.fromList Equality.string (Hashing.string 3) shuffledList
           actual =
-            HashDict.lookup (Tuple.first head) hashDict
+            HashDict.get (Tuple.first head) hashDict
           in equal expected actual
     ]

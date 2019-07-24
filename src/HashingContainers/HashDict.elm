@@ -54,8 +54,8 @@ remove = mapHashTrieAtKey HashTrie.remove
 update : key -> (Maybe value -> Maybe value) -> HashDict key value -> HashDict key value
 update key updateFn = mapHashTrieAtKey (HashTrie.update (Maybe.map Tuple.second >> updateFn >> Maybe.map (Tuple.pair key))) key
 
-lookup : key -> HashDict key value -> Maybe value
-lookup key = accessHashTrieAtKey HashTrie.lookup key >> Maybe.map Tuple.second
+get : key -> HashDict key value -> Maybe value
+get key = accessHashTrieAtKey HashTrie.get key >> Maybe.map Tuple.second
 
 isEmpty : HashDict key value -> Bool
 isEmpty = .trie >> HashTrie.isEmpty
