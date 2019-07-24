@@ -27,9 +27,9 @@ fromFoldable :
 fromFoldable fold equality hashing entryToKey foldable =
   HashTrie equality hashing entryToKey
     (Data.fromFoldable
+      fold
       (Hashing.map entryToKey hashing).hash
       (Equality.map entryToKey equality).eq
-      fold
       foldable)
 
 fromList : Equality key -> Hashing key -> (entry -> key) -> List entry -> HashTrie key entry
@@ -50,7 +50,7 @@ insert entry hashTrie =
         hash = hashTrie.hashing.hash key
         eq = hashTrie.equality.eq
         entryToKey = hashTrie.entryToKey
-        in Data.insert hash (eq key << entryToKey) entry hashTrie.data
+        in Data.insert entry hash (eq key << entryToKey) hashTrie.data
   }
 
 remove : key -> HashTrie key entry -> HashTrie key entry
@@ -76,7 +76,7 @@ update key updateFn hashTrie =
         hash = hashTrie.hashing.hash key
         eq = hashTrie.equality.eq
         entryToKey = hashTrie.entryToKey
-        in Data.update hash (eq key << entryToKey) updateFn hashTrie.data
+        in Data.update updateFn hash (eq key << entryToKey) hashTrie.data
   }
 
 -- * Access

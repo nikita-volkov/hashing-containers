@@ -13,20 +13,20 @@ empty : Data entry
 empty = IntDict.empty
 
 fromFoldable :
+  ((entry -> Data entry -> Data entry) -> Data entry -> foldable -> Data entry) ->
   (entry -> Int) ->
   (entry -> entry -> Bool) ->
-  ((entry -> Data entry -> Data entry) -> Data entry -> foldable -> Data entry) ->
   foldable ->
   Data entry
-fromFoldable entryHash entryEq fold =
-  fold (\ entry -> insert (entryHash entry) (entryEq entry) entry)
+fromFoldable foldFn entryHash entryEq =
+  foldFn (\ entry -> insert entry (entryHash entry) (entryEq entry))
     empty
 
 -- * Tranformation
 -------------------------
 
-insert : Int -> (entry -> Bool) -> entry -> Data entry -> Data entry
-insert hash entryPredicate entry =
+insert : entry -> Int -> (entry -> Bool) -> Data entry -> Data entry
+insert entry hash entryPredicate =
   let
     intDictUpdate listMaybe = case listMaybe of
       Just list ->
@@ -50,8 +50,8 @@ remove hash entryPredicate =
 Caution! This function is not safe.
 Your update to the entry must not affect its key projection.
 -}
-update : Int -> (entry -> Bool) -> (Maybe entry -> Maybe entry) -> Data entry -> Data entry
-update hash entryPredicate updateFn =
+update : (Maybe entry -> Maybe entry) -> Int -> (entry -> Bool) -> Data entry -> Data entry
+update updateFn hash entryPredicate =
   let
     intDictUpdate listMaybe = case listMaybe of
       Just list -> case List.findAndUpdate entryPredicate updateFn list of
