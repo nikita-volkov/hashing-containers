@@ -3,9 +3,7 @@ module HashingContainers.HashTrie exposing (..)
 import Array exposing (Array)
 import Typeclasses.Classes.Equality as Equality exposing (Equality)
 import Typeclasses.Classes.Hashing as Hashing exposing (Hashing)
-import IntDict exposing (IntDict)
-import Typeclasses.Extensions.List as List
-import HashingContainers.Extensions.List as List
+import HashingContainers.HashTrie.Data as Data exposing (Data)
 
 
 type alias HashTrie key entry =
@@ -13,38 +11,47 @@ type alias HashTrie key entry =
     equality : Equality key,
     hashing : Hashing key,
     entryToKey : entry -> key,
-    data : IntDict (List entry)
+    data : Data entry
   }
 
 -- * Construction
 -------------------------
 
 empty : Equality key -> Hashing key -> (entry -> key) -> HashTrie key entry
-empty equality hashing entryToKey = HashTrie equality hashing entryToKey IntDict.empty
+empty equality hashing entryToKey = HashTrie equality hashing entryToKey Data.empty
+
+fromFoldable :
+  ((entry -> Data entry -> Data entry) -> Data entry -> foldable -> Data entry) ->
+  Equality key -> Hashing key -> (entry -> key) ->
+  foldable -> HashTrie key entry
+fromFoldable fold equality hashing entryToKey foldable =
+  HashTrie equality hashing entryToKey
+    (Data.fromFoldable
+      (Hashing.map entryToKey hashing).hash
+      (Equality.map entryToKey equality).eq
+      fold
+      foldable)
 
 fromList : Equality key -> Hashing key -> (entry -> key) -> List entry -> HashTrie key entry
-fromList equality hashing entryToKey = List.foldl insert (empty equality hashing entryToKey)
+fromList = fromFoldable List.foldl
 
 fromArray : Equality key -> Hashing key -> (entry -> key) -> Array entry -> HashTrie key entry
-fromArray equality hashing entryToKey = Array.foldl insert (empty equality hashing entryToKey)
+fromArray = fromFoldable Array.foldl
 
 -- * Tranformation
 -------------------------
 
 insert : entry -> HashTrie key entry -> HashTrie key entry
 insert entry hashTrie =
-  let
-    key = hashTrie.entryToKey entry
-    hash = hashTrie.hashing.hash key
-    eq = hashTrie.equality.eq
-    entryToKey = hashTrie.entryToKey
-    updateIntDict maybeList = case maybeList of
-      Just list ->
-        let
-          updateFn _ = Just entry
-          in List.findAndUpdate (eq key << entryToKey) updateFn list |> Just
-      Nothing -> Just (List.singleton entry)
-    in { hashTrie | data = IntDict.update hash updateIntDict hashTrie.data }
+  { hashTrie |
+    data =
+      let
+        key = hashTrie.entryToKey entry
+        hash = hashTrie.hashing.hash key
+        eq = hashTrie.equality.eq
+        entryToKey = hashTrie.entryToKey
+        in Data.insert hash (eq key << entryToKey) entry hashTrie.data
+  }
 
 remove : key -> HashTrie key entry -> HashTrie key entry
 remove key hashTrie =
@@ -54,12 +61,7 @@ remove key hashTrie =
         hash = hashTrie.hashing.hash key
         eq = hashTrie.equality.eq
         entryToKey = hashTrie.entryToKey
-        updateIntDict maybeList = case maybeList of
-          Just list -> case List.findAndRemove (eq key << entryToKey) list of
-            [] -> Nothing
-            newList -> Just newList
-          Nothing -> Nothing
-        in IntDict.update hash updateIntDict hashTrie.data
+        in Data.remove hash (eq key << entryToKey) hashTrie.data
   }
 
 {-|
@@ -74,14 +76,7 @@ update key updateFn hashTrie =
         hash = hashTrie.hashing.hash key
         eq = hashTrie.equality.eq
         entryToKey = hashTrie.entryToKey
-        updateIntDict maybeList = case maybeList of
-          Just list -> case List.findAndUpdate (eq key << entryToKey) updateFn list of
-            [] -> Nothing
-            newList -> Just newList
-          Nothing -> case updateFn Nothing of
-            Just newEntry -> Just (List.singleton newEntry)
-            Nothing -> Nothing
-        in IntDict.update hash updateIntDict hashTrie.data
+        in Data.update hash (eq key << entryToKey) updateFn hashTrie.data
   }
 
 -- * Access
@@ -93,18 +88,13 @@ lookup key hashTrie =
     hash = hashTrie.hashing.hash key
     eq = hashTrie.equality.eq
     entryToKey = hashTrie.entryToKey
-    in case IntDict.get hash hashTrie.data of
-      Just entryList -> List.find (eq key << entryToKey) entryList
-      Nothing -> Nothing
+    in Data.lookup hash (eq key << entryToKey) hashTrie.data
 
 isEmpty : HashTrie key entry -> Bool
-isEmpty = .data >> IntDict.isEmpty
+isEmpty = .data >> Data.isEmpty
 
-foldl : (entry -> acc -> acc) -> acc -> HashTrie key entry -> acc
-foldl step acc = .data >> IntDict.foldl (\ _ entryList innerAcc -> List.foldl step innerAcc entryList) acc
+foldl : (entry -> folding -> folding) -> folding -> HashTrie key entry -> folding
+foldl step folding = .data >> Data.foldl step folding
 
 toList : HashTrie key entry -> List entry
-toList =
-  let
-    step hash entryList list = entryList ++ list
-    in .data >> IntDict.foldl step []
+toList = .data >> Data.toList
