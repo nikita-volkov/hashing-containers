@@ -39,12 +39,8 @@ Generic set of hashable elements.
 Unlike `Set` from the "core" library it is not
 limited to any specific set of supported types for elements.
 -}
-type alias HashSet value =
-  {
-    equality : Equality value,
-    hashing : Hashing value,
-    trie : HashTrie value
-  }
+type HashSet value =
+  HashSet (Equality value) (Hashing value) (HashTrie value)
 
 {-|
 Construct an empty HashSet,
@@ -88,15 +84,19 @@ fromArray : Equality value -> Hashing value -> Array value -> HashSet value
 fromArray = fromFoldable Array.foldl
 
 accessHashTrieAtKey : (Int -> (value -> Bool) -> HashTrie value -> result) -> value -> HashSet value -> result
-accessHashTrieAtKey fn value hashSet =
+accessHashTrieAtKey fn value (HashSet equality hashing trie) =
   let
-    hash = hashSet.hashing.hash value
-    eq = hashSet.equality.eq
-    in fn hash (eq value) hashSet.trie
+    hash = hashing.hash value
+    eq = equality.eq
+    in fn hash (eq value) trie
 
 mapHashTrieAtKey : (Int -> (value -> Bool) -> HashTrie value -> HashTrie value) -> value -> HashSet value -> HashSet value
-mapHashTrieAtKey fn value hashSet =
-  { hashSet | trie = accessHashTrieAtKey fn value hashSet }
+mapHashTrieAtKey fn value (HashSet equality hashing trie) =
+  let
+    hash = hashing.hash value
+    eq = equality.eq
+    newTrie = fn hash (eq value) trie
+    in HashSet equality hashing trie
 
 {-|
 Insert a value into a set.
@@ -120,16 +120,16 @@ member value = accessHashTrieAtKey HashTrie.get value >> Maybe.match False (alwa
 Determine if a set is empty.
 -}
 isEmpty : HashSet value -> Bool
-isEmpty = .trie >> HashTrie.isEmpty
+isEmpty (HashSet _ _ trie) = trie |> HashTrie.isEmpty
 
 {-|
 Fold over the values in a set.
 -}
 foldl : (value -> folding -> folding) -> folding -> HashSet value -> folding
-foldl step folding = .trie >> HashTrie.foldl step folding
+foldl step folding (HashSet _ _ trie) = trie |> HashTrie.foldl step folding
 
 {-|
 Convert a set into a list.
 -}
 toList : HashSet value -> List value
-toList = .trie >> HashTrie.toList
+toList (HashSet _ _ trie) = trie |> HashTrie.toList

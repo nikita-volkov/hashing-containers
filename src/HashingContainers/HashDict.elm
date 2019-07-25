@@ -42,12 +42,8 @@ limited to any specific set of supported types for keys.
 Unlike the association list implementations it does not suffer
 from linear performance characteristics.
 -}
-type alias HashDict key value =
-  {
-    equality : Equality key,
-    hashing : Hashing key,
-    trie : HashTrie (key, value)
-  }
+type HashDict key value =
+  HashDict (Equality key) (Hashing key) (HashTrie (key, value))
 
 {-|
 Construct an empty HashDict,
@@ -95,15 +91,19 @@ fromArray : Equality key -> Hashing key -> Array (key, value) -> HashDict key va
 fromArray = fromFoldable Array.foldl
 
 accessHashTrieAtKey : (Int -> ((key, value) -> Bool) -> HashTrie (key, value) -> result) -> key -> HashDict key value -> result
-accessHashTrieAtKey fn key hashDict =
+accessHashTrieAtKey fn key (HashDict equality hashing trie) =
   let
-    hash = hashDict.hashing.hash key
-    eq = hashDict.equality.eq
-    in fn hash (Tuple.first >> eq key) hashDict.trie
+    hash = hashing.hash key
+    eq = equality.eq
+    in fn hash (Tuple.first >> eq key) trie
 
 mapHashTrieAtKey : (Int -> ((key, value) -> Bool) -> HashTrie (key, value) -> HashTrie (key, value)) -> key -> HashDict key value -> HashDict key value
-mapHashTrieAtKey fn key hashDict =
-  { hashDict | trie = accessHashTrieAtKey fn key hashDict }
+mapHashTrieAtKey fn key (HashDict equality hashing trie) =
+  let
+    hash = hashing.hash key
+    eq = equality.eq
+    newTrie = fn hash (Tuple.first >> eq key) trie
+    in HashDict equality hashing newTrie
 
 {-|
 Insert an association pair into dictionary,
@@ -136,16 +136,16 @@ get key = accessHashTrieAtKey HashTrie.get key >> Maybe.map Tuple.second
 Determine if a dictionary is empty.
 -}
 isEmpty : HashDict key value -> Bool
-isEmpty = .trie >> HashTrie.isEmpty
+isEmpty (HashDict _ _ trie) = trie |> HashTrie.isEmpty
 
 {-|
 Fold over the key-value pairs in the dictionary.
 -}
 foldl : ((key, value) -> folding -> folding) -> folding -> HashDict key value -> folding
-foldl step folding = .trie >> HashTrie.foldl step folding
+foldl step folding (HashDict _ _ trie) = trie |> HashTrie.foldl step folding
 
 {-|
 Convert a dictionary into an association list of key-value pairs.
 -}
 toList : HashDict key value -> List (key, value)
-toList = .trie >> HashTrie.toList
+toList (HashDict _ _ trie) = trie |> HashTrie.toList
