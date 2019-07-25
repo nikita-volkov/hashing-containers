@@ -26,7 +26,7 @@ and
 explicit typeclasses.
 
 For general introduction to explicit typeclasses,
-see [the readme of the "typeclasses" library]([`Hashing`](/packages/nikita-volkov/typeclasses/1.5.0).
+see [the readme of the "typeclasses" library](/packages/nikita-volkov/typeclasses/1.5.0).
 
 @docs empty, fromList, fromArray
 
