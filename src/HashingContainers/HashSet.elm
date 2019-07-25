@@ -17,12 +17,25 @@ HashSet API.
 @docs HashSet
 
 # Construction
+
+All construction functions require you to provide
+instances for
+[`Equality`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Equality)
+and
+[`Hashing`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Hashing)
+explicit typeclasses.
+
+For general introduction to explicit typeclasses,
+see [the readme of the "typeclasses" library]([`Hashing`](/packages/nikita-volkov/typeclasses/1.5.0).
+
 @docs empty, fromList, fromArray
 
 # Transformation
+
 @docs insert, remove
 
 # Access
+
 @docs member, isEmpty, foldl, toList
 -}
 
@@ -44,11 +57,7 @@ type HashSet value =
 
 {-|
 Construct an empty HashSet,
-providing instances of
-[`Equality`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Equality#Equality)
-and
-[`Hashing`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Hashing#Hashing)
-explicit typeclasses for value.
+providing the required instances.
 -}
 empty : Equality value -> Hashing value -> HashSet value
 empty equality hashing = HashSet equality hashing HashTrie.empty
@@ -63,22 +72,14 @@ fromFoldable fold equality hashing foldable =
 
 {-|
 Construct from a list of values,
-providing instances of
-[`Equality`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Equality#Equality)
-and
-[`Hashing`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Hashing#Hashing)
-explicit typeclasses for value.
+providing the required instances.
 -}
 fromList : Equality value -> Hashing value -> List value -> HashSet value
 fromList = fromFoldable List.foldl
 
 {-|
 Construct from an array of values,
-providing instances of
-[`Equality`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Equality#Equality)
-and
-[`Hashing`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Hashing#Hashing)
-explicit typeclasses for value.
+providing the required instances.
 -}
 fromArray : Equality value -> Hashing value -> Array value -> HashSet value
 fromArray = fromFoldable Array.foldl

@@ -18,12 +18,25 @@ HashDict API.
 @docs HashDict
 
 # Construction
+
+All construction functions require you to provide
+instances for
+[`Equality`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Equality)
+and
+[`Hashing`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Hashing)
+explicit typeclasses.
+
+For general introduction to explicit typeclasses,
+see [the readme of the "typeclasses" library]([`Hashing`](/packages/nikita-volkov/typeclasses/1.5.0).
+
 @docs empty, fromList, fromArray
 
 # Transformation
+
 @docs insert, remove, update
 
 # Access
+
 @docs get, isEmpty, foldl, toList
 -}
 
@@ -47,11 +60,7 @@ type HashDict key value =
 
 {-|
 Construct an empty HashDict,
-providing instances of
-[`Equality`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Equality#Equality)
-and
-[`Hashing`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Hashing#Hashing)
-explicit typeclasses for key.
+providing the required instances for key.
 -}
 empty : Equality key -> Hashing key -> HashDict key value
 empty equality hashing = HashDict equality hashing HashTrie.empty
@@ -70,22 +79,14 @@ fromFoldable fold equality hashing foldable =
 
 {-|
 Construct HashDict from a list of association pairs,
-providing instances of
-[`Equality`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Equality#Equality)
-and
-[`Hashing`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Hashing#Hashing)
-explicit typeclasses for key.
+providing the required instances for key.
 -}
 fromList : Equality key -> Hashing key -> List (key, value) -> HashDict key value
 fromList = fromFoldable List.foldl
 
 {-|
 Construct HashDict from an array of association pairs,
-providing instances of
-[`Equality`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Equality#Equality)
-and
-[`Hashing`](/packages/nikita-volkov/typeclasses/1.5.0/Typeclasses-Classes-Hashing#Hashing)
-explicit typeclasses for key.
+providing the required instances for key.
 -}
 fromArray : Equality key -> Hashing key -> Array (key, value) -> HashDict key value
 fromArray = fromFoldable Array.foldl
