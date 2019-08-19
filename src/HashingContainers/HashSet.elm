@@ -97,7 +97,7 @@ mapHashTrieAtKey fn value (HashSet equality hashing trie) =
     hash = hashing.hash value
     eq = equality.eq
     newTrie = fn hash (eq value) trie
-    in HashSet equality hashing trie
+    in HashSet equality hashing newTrie
 
 {-|
 Insert a value into a set.
