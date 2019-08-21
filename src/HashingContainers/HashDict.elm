@@ -38,7 +38,7 @@ see [the readme of the "typeclasses" library](/packages/nikita-volkov/typeclasse
 
 # Access
 
-@docs get, isEmpty, foldl, toList
+@docs get, isEmpty, size, foldl, toList
 -}
 
 import Array exposing (Array)

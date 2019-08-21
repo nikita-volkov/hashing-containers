@@ -3,7 +3,7 @@
     "name": "nikita-volkov/hashing-containers",
     "summary": "Hashing-based container datastructures",
     "license": "MIT",
-    "version": "2.0.2",
+    "version": "2.1.0",
     "exposed-modules": [
         "HashingContainers.HashDict",
         "HashingContainers.HashSet"
