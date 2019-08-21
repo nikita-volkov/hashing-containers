@@ -9,6 +9,7 @@ module HashingContainers.HashDict exposing
     update,
     get,
     isEmpty,
+    size,
     foldl,
     toList
   )
@@ -138,6 +139,13 @@ Determine if a dictionary is empty.
 -}
 isEmpty : HashDict key value -> Bool
 isEmpty (HashDict _ _ trie) = trie |> HashTrie.isEmpty
+
+{-|
+_O(n)_. Count the elements of the dict.
+Same as `foldl (\ _ x -> x + 1) 0`.
+-}
+size : HashDict key value -> Int
+size = foldl (\ _ x -> x + 1) 0
 
 {-|
 Fold over the key-value pairs in the dictionary.

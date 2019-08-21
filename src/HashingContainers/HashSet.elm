@@ -8,6 +8,7 @@ module HashingContainers.HashSet exposing
     remove,
     member,
     isEmpty,
+    size,
     foldl,
     toList
   )
@@ -122,6 +123,13 @@ Determine if a set is empty.
 -}
 isEmpty : HashSet value -> Bool
 isEmpty (HashSet _ _ trie) = trie |> HashTrie.isEmpty
+
+{-|
+_O(n)_. Count the elements of the set.
+Same as `foldl (\ _ x -> x + 1) 0`.
+-}
+size : HashSet value -> Int
+size = foldl (\ _ x -> x + 1) 0
 
 {-|
 Fold over the values in a set.
